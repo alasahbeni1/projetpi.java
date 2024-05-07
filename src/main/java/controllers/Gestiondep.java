@@ -4,11 +4,13 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import models.department;
-import models.employee;
+import javafx.stage.Stage;
+import models.Department;
 import services.departmentService;
 
 import java.io.IOException;
@@ -30,19 +32,19 @@ public class Gestiondep {
     private Button updateButton;
 
     @FXML
-    private TableColumn<department, String> local;
+    private TableColumn<Department, String> local;
 
     @FXML
-    private TableColumn<department, String> chef_dep;
+    private TableColumn<Department, String> chef_dep;
 
     @FXML
-    private TableColumn<department, Integer> code;
+    private TableColumn<Department, Integer> code;
 
     @FXML
-    private TableColumn<department, Integer> idep;
+    private TableColumn<Department, Integer> idep;
 
     @FXML
-    private TableView<department> tableview;
+    private TableView<Department> tableview;
 
     private final departmentService dep = new departmentService();
 
@@ -57,7 +59,7 @@ public class Gestiondep {
 
         try {
             // Fetch employee data from the service
-            List<department> departmentList = dep.getDepartmentList();
+            List<Department> departmentList = dep.getDepartmentList();
 
             // Populate the TableView with the retrieved data
             tableview.setItems(FXCollections.observableArrayList(departmentList));
@@ -71,9 +73,9 @@ public class Gestiondep {
     @FXML
     void filterByLocal(ActionEvent event) {
         try {
-            List<department> departmentList = dep.getDepartmentList();
+            List<Department> departmentList = dep.getDepartmentList();
 
-            Collections.sort(departmentList, Comparator.comparing(department::getLocal));
+            Collections.sort(departmentList, Comparator.comparing(Department::getLocal));
 
             tableview.setItems(FXCollections.observableArrayList(departmentList));
         } catch (SQLException e) {
@@ -83,9 +85,9 @@ public class Gestiondep {
 
     void filterDepartments(String query) {
         try {
-            List<department> departmentList = dep.getDepartmentList();
-            List<department> filteredList = new ArrayList<>();
-            for (department dep : departmentList) {
+            List<Department> departmentList = dep.getDepartmentList();
+            List<Department> filteredList = new ArrayList<>();
+            for (Department dep : departmentList) {
                 if (depContainsQuery(dep, query)) {
                     filteredList.add(dep);
                 }
@@ -96,7 +98,7 @@ public class Gestiondep {
         }
     }
 
-    boolean depContainsQuery(department dep, String query) {
+    boolean depContainsQuery(Department dep, String query) {
         return dep.getLocal().toLowerCase().contains(query.toLowerCase()) ||
                 dep.getChef_dep().toLowerCase().contains(query.toLowerCase()) ||
                 Integer.toString(dep.getCode()).toLowerCase().contains(query.toLowerCase()) ||
@@ -137,7 +139,7 @@ public class Gestiondep {
 
     @FXML
     void delete(ActionEvent event) {
-        department selectedDepartment = tableview.getSelectionModel().getSelectedItem();
+        Department selectedDepartment = tableview.getSelectionModel().getSelectedItem();
 
         if (selectedDepartment != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -169,7 +171,7 @@ public class Gestiondep {
     }
     @FXML
     void updatedep(ActionEvent event) {
-        department selectedDepartment = tableview.getSelectionModel().getSelectedItem();
+        Department selectedDepartment = tableview.getSelectionModel().getSelectedItem();
 
         if (selectedDepartment != null) {
             // Load the Edit_dep.fxml file
@@ -213,7 +215,7 @@ public class Gestiondep {
 
 
 
-    public department getSelectedDepartment() {
+    public Department getSelectedDepartment() {
         return tableview.getSelectionModel().getSelectedItem();
     }
 
@@ -222,5 +224,26 @@ public class Gestiondep {
         //searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
         // filterDepartments(newValue);
         //});
+    }
+
+    @FXML
+    void retourneremp(ActionEvent event) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gestionemp.fxml"));
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Optionally, you can get the controller of the "gestiondep.fxml" if needed
+        Gestionemp controller = loader.getController();
+
+        // Display the new interface
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(scene);
+        stage.show();
     }
 }

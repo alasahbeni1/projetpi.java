@@ -22,7 +22,7 @@ public class maininterface extends Application {
         try {
             Parent root = loader.load();
             primaryStage.setTitle("Dashboard");
-            Scene sr = new Scene(root, 1200, 850);
+            Scene sr = new Scene(root, 1200, 750);
             primaryStage.setScene(sr);
             primaryStage.show();
         } catch (IOException e) {
@@ -30,5 +30,7 @@ public class maininterface extends Application {
         }
 
     }
+
+
 
 }

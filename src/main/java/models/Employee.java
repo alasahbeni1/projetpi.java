@@ -1,6 +1,6 @@
 package models;
 
-public class employee {
+public class Employee {
 
 
         private int id;
@@ -23,7 +23,7 @@ public class employee {
 
 
 
-    public employee() {
+    public Employee() {
     }
 
     public int getId() {
@@ -81,7 +81,7 @@ public class employee {
         this.nom = nom;
         this.email = email;
     }*/
-    public employee(int id, int idep, String nom, String email, int salaire) {
+    public Employee(int id, int idep, String nom, String email, int salaire) {
         this.id = id;
         this.idep = idep;
         this.nom = nom;
@@ -100,19 +100,19 @@ public class employee {
                 '}';
     }
 
-    public employee(int idepemp, String nomemp, String emailemp, float salaireemp) {
+    public Employee(int idepemp, String nomemp, String emailemp, float salaireemp) {
         this.idep = idep;
         this.salaire = salaire;
         this.nom = nom;
         this.email= email;
     }
-    private department department;
+    private Department department;
 
-    public department getDepartment() {
+    public Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(department department) {
+    public void setDepartment(Department department) {
         this.department = department;
     }
 }

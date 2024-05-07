@@ -4,9 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import models.department;
-import models.employee;
-import services.departmentService;
+import models.Employee;
 import services.employeeService;
 
 import java.sql.SQLException;
@@ -75,7 +73,7 @@ public class AddEmployee {
 
 
 
-        employee employee = new employee(0, idepEmp, nomEmp, emailEmp, salaireEmp); // Assuming id is auto-generated
+        Employee employee = new Employee(0, idepEmp, nomEmp, emailEmp, salaireEmp); // Assuming id is auto-generated
 
         employeeService employeeService = new employeeService();
         try {
@@ -102,9 +100,9 @@ public class AddEmployee {
     private boolean isExisting(int idepEmp,String nomEmp, String emailEmp, float salaireEmp) throws SQLException {
         employeeService empService = new employeeService();
         try {
-            List<employee> allEmployees = empService.getAll();
+            List<Employee> allEmployees = empService.getAll();
             if (allEmployees != null) {
-                for (employee existing : allEmployees) {
+                for (Employee existing : allEmployees) {
                     if (existing.getNom().equals(nomEmp)
                             && existing.getEmail().equals(emailEmp)
                             && existing.getSalaire() == salaireEmp) {

@@ -1,14 +1,14 @@
 package models;
 
-public class department {
+public class Department {
     private int idep;
     private String local;
     private String chef_dep;
     private int code;
 
-    public department() {}
+    public Department() {}
 
-    public department(String local, String chef_dep, int code) {
+    public Department(String local, String chef_dep, int code) {
         this.local = local;
         this.chef_dep = chef_dep;
         this.code = code;
@@ -48,7 +48,7 @@ public class department {
         this.code = code;
     }
 
-    public department(int idep, String local, String chef_dep, int code) {
+    public Department(int idep, String local, String chef_dep, int code) {
         this.idep = idep;
         this.local = local;
         this.chef_dep = chef_dep;

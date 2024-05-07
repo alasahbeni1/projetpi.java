@@ -1,8 +1,5 @@
 package org.example;
 
-import models.department;
-import models.employee;
-import services.departmentService;
 import services.employeeService;
 
 import java.sql.SQLException;

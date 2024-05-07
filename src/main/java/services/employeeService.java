@@ -2,7 +2,7 @@ package services;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import models.employee;
+import models.Employee;
 import utils.MyDB;
 
 import java.sql.*;
@@ -11,14 +11,14 @@ import java.util.List;
 
 
 
-public class employeeService implements empService<employee> {
+public class employeeService implements empService<Employee> {
     private Connection connection;
     public employeeService() {
         this.connection = MyDB.getInstance().getConnection();
     }
 
     @Override
-    public  void add(employee employee) throws SQLException {
+    public  void add(Employee employee) throws SQLException {
         String sql = "INSERT INTO employee (idep,nom, email, salaire) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -48,7 +48,7 @@ public class employeeService implements empService<employee> {
 
 
     @Override
-    public void update(employee employee) throws SQLException {
+    public void update(Employee employee) throws SQLException {
         String sql = "update employee set nom = ?,idep = ? , email = ?, salaire = ? where id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
@@ -74,20 +74,20 @@ public class employeeService implements empService<employee> {
     }
 
     @Override
-    public List<employee> getAll() throws SQLException {
+    public List<Employee> getAll() throws SQLException {
         return List.of();
     }
 
 
-    public List<employee> getAllEmployees() throws SQLException {
-        List<employee> employees = new ArrayList<>();
+    public List<Employee> getAllEmployees() throws SQLException {
+        List<Employee> Employees = new ArrayList<>();
 
         String sql = "SELECT * FROM employee";
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                employee employee = new employee();
+                Employee employee = new Employee();
                 // Assuming your Employee class has appropriate setters
                 employee.setId(resultSet.getInt("id"));
                 employee.setNom(resultSet.getString("nom"));
@@ -97,27 +97,27 @@ public class employeeService implements empService<employee> {
                 // For example:
                 // employee.setDepartment(fetchDepartment(resultSet.getInt("idep")));
 
-                employees.add(employee);
+                Employees.add(employee);
             }
         } catch (SQLException e) {
             // Handle SQLException
             throw new SQLException("Error occurred while fetching employees.", e);
         }
 
-        return employees;
+        return Employees;
     }
 
-    public ObservableList<employee> getEmployeeList() throws SQLException {
+    public ObservableList<Employee> getEmployeeList() throws SQLException {
 
-        ObservableList<employee> employeeList = FXCollections.observableArrayList();
+        ObservableList<Employee> employeeList = FXCollections.observableArrayList();
 
-        List <employee> emp = new ArrayList<>();
+        List <Employee> emp = new ArrayList<>();
         Statement stm = connection.createStatement();
         String query = "select * from employee";
         ResultSet rs;
         rs = stm.executeQuery(query);
         while (rs.next()) {
-            employee r = new employee();
+            Employee r = new Employee();
             r.setIdep(rs.getInt("idep"));
             r.setId(rs.getInt("id"));
             r.setSalaire((int) rs.getFloat("salaire"));
@@ -130,8 +130,10 @@ public class employeeService implements empService<employee> {
 
     }
 
+
+
     @Override
-    public employee getById(int idemployee) throws SQLException {
+    public Employee getById(int idemployee) throws SQLException {
         String sql = "SELECT `idep`, `nom`,`email`,`salaire` FROM `employee` WHERE `id` = ?";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, idemployee);
@@ -145,12 +147,59 @@ public class employeeService implements empService<employee> {
             int salaire = resultSet.getInt("salaire");
 
 
-            return new employee(idemployee, idep,nom,email,salaire);
+            return new Employee(idemployee, idep,nom,email,salaire);
         } else {
             // Handle the case when no matching record is found
             return null;
         }
 
     }
+
+
+    public List<Employee> getEmployeeForPage(int pageIndex, int itemsPerPage) throws SQLException {
+        // Calculez l'index de départ en fonction du numéro de page et du nombre d'éléments par page
+        int startIndex = pageIndex * itemsPerPage;
+
+        MyDB myDB = new MyDB();
+        Connection connection = myDB.getConnection();
+
+
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            // Préparez la requête SQL pour récupérer les employés de la page actuelle
+            String query = "SELECT * FROM employee LIMIT ?, ?";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, startIndex);
+            statement.setInt(2, itemsPerPage);
+            resultSet = statement.executeQuery();
+
+            // Parcourez le résultat et créez une liste d'objets Employee
+            List<Employee> employeeList = new ArrayList<>();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String nom = resultSet.getString("nom");
+                String email = resultSet.getString("email");
+                int salaire =  resultSet.getInt("salaire");
+                int idep = resultSet.getInt("idep");
+                Employee employee = new Employee(id,idep,nom, email, salaire);
+                employeeList.add(employee);
+            }
+            return employeeList;
+        } finally {
+            // Fermez les ressources
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
+
 
 }

@@ -10,8 +10,28 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import models.employee;
+import javafx.util.Callback;
+import models.Employee;
+
 import services.employeeService;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Pagination;
+import javafx.util.Callback;
+
+
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.Pagination;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
+import models.Employee;
+import services.employeeService;
+
+import java.sql.SQLException;
+import java.util.List;
+
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,55 +55,83 @@ public class Gestionemp {
     private Button ajouteButton;
 
     @FXML
-    private TableColumn<employee, String> nom;
+    private TableColumn<Employee, String> nom;
 
     @FXML
-    private TableColumn<employee, String> email;
+    private TableColumn<Employee, String> email;
     @FXML
-    private TableColumn<employee, String> salaire;
+    private TableColumn<Employee, String> salaire;
 
     @FXML
-    private TableColumn<employee, Integer> id;
+    private TableColumn<Employee, Integer> id;
 
     @FXML
-    private TableColumn<employee, Integer> idep;
+    private TableColumn<Employee, Integer> idep;
 
     @FXML
-    private TableView<employee> tableview;
+    private TableView<Employee> tableview;
+
+    @FXML
+    private Button generatePDFButton;
+
+
+
+
+
+    @FXML
+    private Pagination pagination;
+
+
 
     private final employeeService emp = new employeeService();
+    private final int itemsPerPage = 5 ;
+
+
+
+
 
     @FXML
-    void ajouterEmp(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/add_employee.fxml"));
-        Parent root;
+    void display() {
+        int pageIndex = pagination.getCurrentPageIndex();
         try {
-            root = loader.load();
-        } catch (IOException e) {
+            // Fetch employee data from the service for the current page
+            List<Employee> employeeList = emp.getEmployeeForPage(pageIndex, itemsPerPage);
+
+            // Populate the TableView with the retrieved data
+            populateTable(employeeList);
+        } catch (SQLException e) {
+            // Handle any SQL exceptions
             e.printStackTrace();
-            return;
+            // You may also consider displaying an error message to the user
         }
+    }
 
-        AddEmployee controller = loader.getController();
+    // Method to populate the TableView with employee data
+    private void populateTable(List<Employee> data) {
+        TableColumn<Employee, String> nom = new TableColumn<>("Nom");
+        nom.setCellValueFactory(new PropertyValueFactory<>("nom"));
 
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.getDialogPane().setContent(root);
-        dialog.setTitle("Add Employee");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        TableColumn<Employee, String> email = new TableColumn<>("Email");
+        email.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        Optional<ButtonType> result = dialog.showAndWait();
+        TableColumn<Employee, String> salaire = new TableColumn<>("Salaire");
+        salaire.setCellValueFactory(new PropertyValueFactory<>("salaire"));
 
-        result.ifPresent(buttonType -> {
-            if (buttonType == ButtonType.OK) {
-                // Call the method to add employee in the AddEmployee controller
-                try {
-                    controller.ajouteremp(new ActionEvent());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+        tableview.getColumns().clear();
+        tableview.getColumns().addAll(nom, email, salaire);
 
-                // Optionally, you can refresh the display after adding the employee
-                // display(new ActionEvent());
+        tableview.setItems(FXCollections.observableArrayList(data));
+    }
+
+    @FXML
+    void initialize() {
+        // Set the page factory for pagination
+        pagination.setPageFactory(new Callback<Integer, Node>() {
+            @Override
+            public Node call(Integer pageIndex) {
+                // Call the display method when changing pages
+                display();
+                return tableview;
             }
         });
     }
@@ -112,32 +160,13 @@ public class Gestionemp {
 
 
 
-    @FXML
-    void display(ActionEvent event) {
-        id.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        email.setCellValueFactory(new PropertyValueFactory<>("email"));
-        salaire.setCellValueFactory(new PropertyValueFactory<>("salaire"));
-        idep.setCellValueFactory(new PropertyValueFactory<>("idep"));
 
-        try {
-            // Fetch employee data from the service
-            List<employee> employeeList = emp.getEmployeeList();
-
-            // Populate the TableView with the retrieved data
-            tableview.setItems(FXCollections.observableArrayList(employeeList));
-        } catch (SQLException e) {
-            // Handle any SQL exceptions by printing the stack trace
-            e.printStackTrace();
-            // You may also consider displaying an error message to the user
-        }
-    }
 
 
     @FXML
     void delete(ActionEvent event) {
         // Obtenez l'élément sélectionné dans la TableView
-        employee selectedEmployee = tableview.getSelectionModel().getSelectedItem();
+        Employee selectedEmployee = tableview.getSelectionModel().getSelectedItem();
         if (selectedEmployee != null) {
             try {
                 // Supprimez l'employé de la base de données en utilisant le service approprié
@@ -169,7 +198,7 @@ public class Gestionemp {
     @FXML
     void update(ActionEvent event) {
         // Obtenez l'élément sélectionné dans la TableView
-        employee selectedEmployee = tableview.getSelectionModel().getSelectedItem();
+        Employee selectedEmployee = tableview.getSelectionModel().getSelectedItem();
         if (selectedEmployee != null) {
             // Affichez une boîte de dialogue ou un formulaire pour mettre à jour les informations de l'employé
             // Vous pouvez implémenter une boîte de dialogue ou un formulaire en fonction de vos besoins
@@ -196,12 +225,7 @@ public class Gestionemp {
 
 
 
-    @FXML
-    void initialize() {
-        //searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-        // filterDepartments(newValue);
-        //});
-    }
+
     @FXML
     void openAddEmployeeWindow(ActionEvent event) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/add_employee.fxml"));
@@ -239,7 +263,7 @@ public class Gestionemp {
 
     @FXML
     void updateemp(ActionEvent event) {
-        employee selectedEmployee = tableview.getSelectionModel().getSelectedItem();
+        Employee selectedEmployee = tableview.getSelectionModel().getSelectedItem();
 
         if (selectedEmployee != null) {
             // Load the Edit_dep.fxml file
@@ -281,5 +305,24 @@ public class Gestionemp {
     }
 
 
+    @FXML
+    void PDF() {
 
-}
+        List<Employee> employeeList = null;
+        try {
+            employeeList = emp.getAllEmployees();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Populate the TableView with the retrieved data
+        tableview.setItems(FXCollections.observableArrayList(employeeList));
+         // Get your employee data
+        PDF.generateEmployeeListPDF(employeeList);
+
+        }
+
+
+    }
+
+

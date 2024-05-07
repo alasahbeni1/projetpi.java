@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import models.department;
+import models.Department;
 import services.departmentService;
 import java.sql.SQLException;
 
@@ -23,10 +23,10 @@ public class EditDep {
     @FXML
     private Button updateButton; // Rename to updateButton to avoid naming conflicts
 
-    private department depart;
+    private Department depart;
     private final departmentService depservice = new departmentService();
 
-    public void initData(department depart) {
+    public void initData(Department depart) {
         this.depart = depart;
         populateFields();
     }

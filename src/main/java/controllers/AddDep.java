@@ -4,10 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import models.department;
-import models.employee;
+import models.Department;
 import services.departmentService;
-import services.employeeService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -58,7 +56,7 @@ public class AddDep {
 
 
 
-        department dep = new department(localdep, chef, codedep);
+        Department dep = new Department(localdep, chef, codedep);
 
         departmentService depService = new departmentService();
         try {

@@ -6,7 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import models.employee;
+import models.Employee;
 import services.employeeService;
 
 import java.sql.SQLException;
@@ -28,10 +28,10 @@ public class EditEmployee {
     @FXML
     private Button updateButton; // Rename to updateButton to avoid naming conflicts
 
-    private employee employ;
+    private Employee employ;
     private final employeeService empservice = new employeeService();
 
-    public void initData(employee employ) {
+    public void initData(Employee employ) {
         this.employ = employ;
         populateFields();
     }

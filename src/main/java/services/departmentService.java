@@ -2,8 +2,8 @@ package services;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import models.department;
-import models.employee;
+import models.Department;
+import models.Employee;
 import utils.MyDB;
 
 import java.sql.*;
@@ -12,14 +12,20 @@ import java.util.List;
 
 
 
-public class departmentService implements depService<department> {
+public class departmentService implements depService<Department> {
     private Connection connection;
     public departmentService() {
 
         this.connection = MyDB.getInstance().getConnection();
     }
+
+
+
+
+
+
     @Override
-    public void add(department department) throws SQLException {
+    public void add(Department department) throws SQLException {
         String sql = "INSERT INTO departments (local, chef_dep, code) VALUES (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, department.getLocal());
@@ -33,7 +39,7 @@ public class departmentService implements depService<department> {
     }
 
     @Override
-    public void update(department department) throws SQLException {
+    public void update(Department department) throws SQLException {
         String sql = "UPDATE departments SET  local = ?, chef_dep = ?, code = ? WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ;
@@ -57,15 +63,15 @@ public class departmentService implements depService<department> {
     }
 
     @Override
-    public List<department> getAll() throws SQLException {
+    public List<Department> getAll() throws SQLException {
         String req = "select * from departments";
 
-        List<department> list1 = new ArrayList<>();
+        List<Department> list1 = new ArrayList<>();
         Statement ste = connection.createStatement();
         ResultSet rs = ste.executeQuery(req);
 
         while (rs.next()) {
-            department r = new department();
+            Department r = new Department();
             r.setIdep(rs.getInt("idep"));
             r.setLocal(rs.getString("local"));
             r.setChef_dep(rs.getString("chef_dep"));
@@ -77,15 +83,15 @@ public class departmentService implements depService<department> {
         return list1;
     }
 
-    public ObservableList<department> getDepartmentList() throws SQLException {
-        ObservableList<department> departmentList = FXCollections.observableArrayList();
+    public ObservableList<Department> getDepartmentList() throws SQLException {
+        ObservableList<Department> departmentList = FXCollections.observableArrayList();
 
         String query = "SELECT * FROM departments";
         try (Statement stm = connection.createStatement();
              ResultSet rs = stm.executeQuery(query)) {
 
             while (rs.next()) {
-                department department = new department();
+                Department department = new Department();
                 // Assuming the correct column name for department ID is 'id'
                 department.setIdep(rs.getInt("id"));
                 department.setLocal(rs.getString("local"));
@@ -104,7 +110,7 @@ public class departmentService implements depService<department> {
 
 
     @Override
-    public department getById(int iddepartment) throws SQLException {
+    public Department getById(int iddepartment) throws SQLException {
 
         String sql = "SELECT  `local`,`chef_dep`,`code` FROM `departments` WHERE `id` = ?";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -119,7 +125,7 @@ public class departmentService implements depService<department> {
             int code = resultSet.getInt("code");
 
 
-            return new department( iddepartment, local, chef_dep, code);
+            return new Department( iddepartment, local, chef_dep, code);
         } else {
             // Handle the case when no matching record is found
             return null;
